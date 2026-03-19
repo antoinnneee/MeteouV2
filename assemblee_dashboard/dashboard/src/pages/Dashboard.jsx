@@ -3,6 +3,7 @@ import { Users, FileText, Activity, CheckCircle, RefreshCw } from 'lucide-react'
 
 export default function DashboardPage({ data }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
   
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -119,21 +120,63 @@ export default function DashboardPage({ data }) {
                  {/* Simple heatmap UI */}
                  <div style={{ padding: '8px', fontWeight: 'bold' }}>Groupes</div>
                  {activeGroups.map(g => (
-                   <div key={`head-${g.uid}`} style={{ padding: '8px 4px', textAlign: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>{g.abrege}</div>
+                   <div 
+                     key={`head-${g.uid}`} 
+                     onClick={() => setSelectedGroup(selectedGroup === g.uid ? null : g.uid)}
+                     style={{ 
+                       padding: '8px 4px', 
+                       textAlign: 'center', 
+                       fontWeight: 'bold', 
+                       fontSize: '0.8rem',
+                       cursor: 'pointer',
+                       backgroundColor: selectedGroup === g.uid ? 'rgba(255,255,255,0.1)' : 'transparent',
+                       borderRadius: '4px',
+                       transition: 'background 0.2s',
+                       borderBottom: `2px solid ${g.couleur}`
+                     }}
+                     title={`Cliquez pour surligner le groupe ${g.abrege}`}
+                   >
+                     {g.abrege}
+                   </div>
                  ))}
                  
                  {activeGroups.map(gRow => (
                    <React.Fragment key={`row-${gRow.uid}`}>
-                     <div style={{ padding: '8px', fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}>{gRow.abrege}</div>
+                     <div 
+                       onClick={() => setSelectedGroup(selectedGroup === gRow.uid ? null : gRow.uid)}
+                       style={{ 
+                         padding: '8px', 
+                         fontWeight: 'bold', 
+                         fontSize: '0.8rem', 
+                         display: 'flex', 
+                         alignItems: 'center',
+                         cursor: 'pointer',
+                         backgroundColor: selectedGroup === gRow.uid ? 'rgba(255,255,255,0.1)' : 'transparent',
+                         borderRadius: '4px',
+                         transition: 'background 0.2s',
+                         borderLeft: `2px solid ${gRow.couleur}`
+                       }}
+                       title={`Cliquez pour surligner le groupe ${gRow.abrege}`}
+                     >
+                       {gRow.abrege}
+                     </div>
                      {activeGroups.map(gCol => {
                        const val = data.alignment_matrix[gRow.uid]?.[gCol.uid] || 0;
+                       const isSelected = selectedGroup && (selectedGroup === gRow.uid || selectedGroup === gCol.uid);
+                       const isDimmed = selectedGroup && !isSelected;
+                       
                        return (
                          <div key={`cell-${gRow.uid}-${gCol.uid}`} style={{ 
                            padding: '8px 4px', 
                            textAlign: 'center', 
-                           backgroundColor: `rgba(88, 166, 255, ${val/100 * 0.5})`,
+                           backgroundColor: `rgba(88, 166, 255, ${val/100 * 0.6})`,
                            borderRadius: '4px',
-                           fontSize: '0.8rem'
+                           fontSize: '0.8rem',
+                           opacity: isDimmed ? 0.15 : 1,
+                           transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+                           border: isSelected ? '1px solid rgba(255,255,255,0.3)' : '1px solid transparent',
+                           transition: 'all 0.2s ease',
+                           zIndex: isSelected ? 1 : 0
                          }}>
                            {val}%
                          </div>
