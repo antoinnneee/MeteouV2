@@ -1,0 +1,16 @@
+# Node
+node_modules/
+dist/
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Local data
+public/db.json
+db.json
+
+# IDEs
+.vscode/
+.idea/
