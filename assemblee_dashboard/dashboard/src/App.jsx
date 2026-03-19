@@ -177,42 +177,58 @@ function App() {
       <div className="app-container">
         <Sidebar />
         <div className="main-content">
-          <div className="flex align-center justify-end" style={{ paddingBottom: '24px', marginBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="flex align-center gap-3">
-              <Calendar size={18} color="var(--text-secondary)" />
-              <span style={{color: 'var(--text-secondary)', fontSize: '0.9rem'}}>Période d'analyse :</span>
-              <select 
-                value={dateRange} 
-                onChange={e => setDateRange(e.target.value)}
-                className="input" 
-                style={{ width: 'auto', padding: '8px 16px', fontSize: '0.9rem', backgroundColor: '#1e293b', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }}
-              >
-                <option value="lastX">Derniers X Scrutins</option>
-                <option value="all">Historique complet (Tous les scrutins)</option>
-                <option value="custom">Période Personnalisée</option>
-                <option value="last30">30 derniers jours</option>
-                <option value="last90">90 derniers jours</option>
-                <option value="2026">Année 2026</option>
-                <option value="2025">Année 2025</option>
-                <option value="2024">Année 2024</option>
-              </select>
-              
-              {dateRange === 'custom' && (
-                <div className="flex align-center gap-2 ml-2">
-                  <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="input" style={{ width: 'auto', padding: '6px 12px', fontSize: '0.9rem', backgroundColor: '#1e293b', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }} />
-                  <span style={{color: 'var(--text-secondary)'}}>au</span>
-                  <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="input" style={{ width: 'auto', padding: '6px 12px', fontSize: '0.9rem', backgroundColor: '#1e293b', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }} />
+          <header className="flex align-center justify-between mb-8 animate-fade-in" style={{ paddingBottom: '2rem', borderBottom: '1px solid var(--panel-border)' }}>
+            <div className="flex align-center gap-4">
+              <div className="glass-panel" style={{ padding: '0.75rem', borderRadius: '14px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                <Calendar size={22} color="var(--accent)" />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Période d'analyse</h4>
+                <div className="flex align-center gap-3 mt-1">
+                  <select 
+                    value={dateRange} 
+                    onChange={e => setDateRange(e.target.value)}
+                    className="input" 
+                    style={{ width: 'auto', minWidth: '220px', padding: '10px 16px', fontWeight: '600' }}
+                  >
+                    <option value="lastX">Derniers X Scrutins</option>
+                    <option value="all">Historique complet</option>
+                    <option value="custom">Période Personnalisée</option>
+                    <option value="last30">30 derniers jours</option>
+                    <option value="last90">90 derniers jours</option>
+                    <option value="2026">Année 2026</option>
+                    <option value="2025">Année 2025</option>
+                    <option value="2024">Année 2024</option>
+                  </select>
+                  
+                  {dateRange === 'custom' && (
+                    <div className="flex align-center gap-2 animate-fade-in">
+                      <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="input" style={{ width: 'auto' }} />
+                      <span style={{color: 'var(--text-secondary)', fontWeight: 'bold'}}>→</span>
+                      <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="input" style={{ width: 'auto' }} />
+                    </div>
+                  )}
+                  
+                  {dateRange === 'lastX' && (
+                    <div className="flex align-center gap-2 animate-fade-in">
+                      <input type="number" min="1" max="10000" value={lastXCount} onChange={e => setLastXCount(parseInt(e.target.value) || 100)} className="input" style={{ width: '100px', textAlign: 'center' }} />
+                      <span style={{color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '600'}}>Scrutins</span>
+                    </div>
+                  )}
                 </div>
-              )}
-              
-              {dateRange === 'lastX' && (
-                <div className="flex align-center gap-2 ml-2">
-                  <input type="number" min="1" max="10000" value={lastXCount} onChange={e => setLastXCount(parseInt(e.target.value) || 100)} className="input" style={{ width: '80px', padding: '6px 12px', fontSize: '0.9rem', backgroundColor: '#1e293b', color: 'white', border: '1px solid rgba(255,255,255,0.2)' }} />
-                  <span style={{color: 'var(--text-secondary)', fontSize: '0.85rem'}}>Scrutins</span>
-                </div>
-              )}
+              </div>
             </div>
-          </div>
+            
+            <div className="flex align-center gap-4">
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Statut Système</div>
+                <div className="flex align-center gap-2 mt-1">
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 8px var(--success)' }}></div>
+                  <span style={{ fontSize: '0.9rem', fontWeight: '700' }}>Live Data</span>
+                </div>
+              </div>
+            </div>
+          </header>
           <Routes>
             <Route path="/" element={<DashboardPage data={filteredData} />} />
             <Route path="/deputies" element={<DeputiesPage data={filteredData} />} />
