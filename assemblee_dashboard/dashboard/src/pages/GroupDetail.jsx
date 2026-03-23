@@ -2,6 +2,16 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, User } from 'lucide-react';
 
+function deputyPresencePct(d) {
+  return d.stats?.total ? (d.stats.present / d.stats.total) * 100 : 0;
+}
+
+function groupAveragePresence(deputies) {
+  if (!deputies.length) return '0.0';
+  const sum = deputies.reduce((acc, d) => acc + deputyPresencePct(d), 0);
+  return (sum / deputies.length).toFixed(1);
+}
+
 export default function GroupDetailPage({ data }) {
   const { id } = useParams();
   const group = data.groups[id];
@@ -13,6 +23,7 @@ export default function GroupDetailPage({ data }) {
     .sort((a,b) => a.nom.localeCompare(b.nom));
     
   const winRate = group.totalVotes ? ((group.victoires / group.totalVotes) * 100).toFixed(1) : 0;
+  const avgPresence = groupAveragePresence(members);
 
   // Find all scrutins where this group took a position
   const groupScrutins = data.scrutins.filter(s => s.groupes[id]);
@@ -61,6 +72,11 @@ export default function GroupDetailPage({ data }) {
             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.05em', marginBottom: '12px' }}>Taux de Victoire</div>
             <h2 style={{ fontSize: '2.2rem', margin: 0, color: 'var(--success)', fontWeight: '900' }}>{winRate}%</h2>
             <p style={{ margin: '8px 0 0 0', fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Sur {group.totalVotes} scrutins</p>
+          </div>
+          <div className="glass-panel" style={{ padding: '24px', background: 'rgba(99, 102, 241, 0.06)', borderRadius: '20px', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.05em', marginBottom: '12px' }}>Présence moyenne</div>
+            <h2 style={{ fontSize: '2.2rem', margin: 0, color: 'var(--accent)', fontWeight: '900' }}>{avgPresence}%</h2>
+            <p style={{ margin: '8px 0 0 0', fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Moyenne des {members.length} députés</p>
           </div>
         </div>
       </div>

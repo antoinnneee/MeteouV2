@@ -1,6 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+function deputyPresencePct(d) {
+  return d.stats?.total ? (d.stats.present / d.stats.total) * 100 : 0;
+}
+
+function groupAveragePresence(deputies) {
+  if (!deputies.length) return '0.0';
+  const sum = deputies.reduce((acc, d) => acc + deputyPresencePct(d), 0);
+  return (sum / deputies.length).toFixed(1);
+}
+
 export default function GroupsPage({ data }) {
   const groups = Object.values(data.groups)
     .sort((a, b) => b.totalVotes - a.totalVotes)
@@ -17,7 +27,9 @@ export default function GroupsPage({ data }) {
       
       <div className="grid-3 animate-fade-in">
         {groups.map(g => {
-           const memberCount = data.deputies.filter(d => d.groupe === g.uid).length;
+           const members = data.deputies.filter(d => d.groupe === g.uid);
+           const memberCount = members.length;
+           const avgPresence = groupAveragePresence(members);
            const winRate = g.totalVotes > 0 ? ((g.victoires / g.totalVotes) * 100).toFixed(1) : 0;
            return (
              <Link key={g.uid} to={`/groups/${g.uid}`} className="glass-panel" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', transition: 'var(--transition)', border: '1px solid var(--panel-border)', borderTop: `6px solid ${g.couleur}`, padding: '24px' }}>
@@ -44,12 +56,16 @@ export default function GroupsPage({ data }) {
                   </div>
                 </div>
                 
-                <div className="flex justify-between mb-6" style={{ background: 'rgba(0,0,0,0.15)', padding: '12px 16px', borderRadius: '12px' }}>
-                  <div>
+                <div className="flex justify-between gap-2 mb-6" style={{ background: 'rgba(0,0,0,0.15)', padding: '12px 16px', borderRadius: '12px' }}>
+                  <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Membres</div>
                     <div style={{ fontWeight: '800', fontSize: '1.1rem' }}>{memberCount}</div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
+                  <div style={{ textAlign: 'center', minWidth: 0 }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Prés. moy.</div>
+                    <div style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--accent)' }}>{avgPresence}%</div>
+                  </div>
+                  <div style={{ textAlign: 'right', minWidth: 0 }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Votes</div>
                     <div style={{ fontWeight: '800', fontSize: '1.1rem' }}>{g.totalVotes}</div>
                   </div>
