@@ -1,6 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Users, FileText, Activity, CheckCircle, RefreshCw } from 'lucide-react';
 
+function groupMatrixTooltip(gr) {
+  const full = gr.libelle || gr.abrege || '';
+  const line =
+    gr.libelle && gr.abrege && gr.libelle !== gr.abrege
+      ? `${gr.libelle} (${gr.abrege})`
+      : full;
+  return `${line} — Cliquez pour surligner ce groupe`;
+}
+
 export default function DashboardPage({ data }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -53,7 +62,7 @@ export default function DashboardPage({ data }) {
         <button 
           onClick={handleRefresh} 
           disabled={isRefreshing}
-          className="btn-primary animate-fade-in" 
+          className="btn btn-primary animate-fade-in" 
           style={{ padding: '14px 28px', borderRadius: '14px' }}
         >
           <RefreshCw size={20} className={isRefreshing ? 'spin' : ''} />
@@ -182,48 +191,66 @@ export default function DashboardPage({ data }) {
                 borderRadius: '16px'
               }}>
                  <div style={{ padding: '8px', fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: '800', textTransform: 'uppercase' }}>Groupes</div>
-                 {activeGroups.map(g => (
-                   <div 
-                     key={`head-${g.uid}`} 
+                 {activeGroups.map(g => {
+                   const partyColor = g.couleur || '#64748b';
+                   return (
+                   <div
+                     key={`head-${g.uid}`}
                      onClick={() => setSelectedGroup(selectedGroup === g.uid ? null : g.uid)}
-                     style={{ 
-                       padding: '10px 4px', 
-                       textAlign: 'center', 
-                       fontWeight: '800', 
-                       fontSize: '0.75rem',
+                     style={{
+                       display: 'flex',
+                       flexDirection: 'column',
+                       borderRadius: '8px',
+                       overflow: 'hidden',
                        cursor: 'pointer',
                        backgroundColor: selectedGroup === g.uid ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-                       borderRadius: '8px',
                        transition: 'var(--transition-fast)',
                        border: selectedGroup === g.uid ? '1px solid var(--accent)' : '1px solid transparent',
-                       color: selectedGroup === g.uid ? 'var(--accent)' : 'inherit'
                      }}
-                     title={`Cliquez pour surligner le groupe ${g.abrege}`}
+                     title={groupMatrixTooltip(g)}
                    >
-                     {g.abrege}
+                     <div style={{ height: '3px', width: '100%', background: partyColor, flexShrink: 0 }} />
+                     <div style={{
+                       padding: '10px 4px',
+                       textAlign: 'center',
+                       fontWeight: '800',
+                       fontSize: '0.75rem',
+                       color: selectedGroup === g.uid ? 'var(--accent)' : 'inherit',
+                     }}>
+                       {g.abrege}
+                     </div>
                    </div>
-                 ))}
+                 );
+                 })}
                  
                  {activeGroups.map(gRow => (
                    <React.Fragment key={`row-${gRow.uid}`}>
-                     <div 
+                     <div
                        onClick={() => setSelectedGroup(selectedGroup === gRow.uid ? null : gRow.uid)}
-                       style={{ 
-                         padding: '10px 8px', 
-                         fontWeight: '800', 
-                         fontSize: '0.75rem', 
-                         display: 'flex', 
-                         alignItems: 'center',
+                       style={{
+                         display: 'flex',
+                         alignItems: 'stretch',
+                         borderRadius: '8px',
+                         overflow: 'hidden',
                          cursor: 'pointer',
                          backgroundColor: selectedGroup === gRow.uid ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
-                         borderRadius: '8px',
                          transition: 'var(--transition-fast)',
                          border: selectedGroup === gRow.uid ? '1px solid var(--accent)' : '1px solid transparent',
-                         color: selectedGroup === gRow.uid ? 'var(--accent)' : 'inherit'
                        }}
-                       title={`Cliquez pour surligner le groupe ${gRow.abrege}`}
+                       title={groupMatrixTooltip(gRow)}
                      >
-                       {gRow.abrege}
+                       <div style={{ width: '3px', flexShrink: 0, background: gRow.couleur || '#64748b', borderRadius: '2px 0 0 2px' }} />
+                       <div style={{
+                         padding: '10px 8px',
+                         fontWeight: '800',
+                         fontSize: '0.75rem',
+                         display: 'flex',
+                         alignItems: 'center',
+                         flex: 1,
+                         color: selectedGroup === gRow.uid ? 'var(--accent)' : 'inherit',
+                       }}>
+                         {gRow.abrege}
+                       </div>
                      </div>
                      {activeGroups.map(gCol => {
                        const val = data.alignment_matrix[gRow.uid]?.[gCol.uid] || 0;
